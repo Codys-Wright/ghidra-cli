@@ -48,8 +48,8 @@
           doCheck = false;
           # Wrap the binary so GHIDRA_INSTALL_DIR is set when ghidra is available
           postInstall = ''
-            mv $out/bin/ghidra $out/bin/.ghidra-unwrapped
-            cat > $out/bin/ghidra <<WRAPPER
+            mv $out/bin/ghidra $out/bin/.ghidra-cli-unwrapped
+            cat > $out/bin/ghidra-cli <<WRAPPER
             #!/bin/sh
             # Auto-detect GHIDRA_INSTALL_DIR from ghidra on PATH if not set
             if [ -z "\$GHIDRA_INSTALL_DIR" ]; then
@@ -59,9 +59,9 @@
                 export GHIDRA_INSTALL_DIR="\$(dirname "\$(dirname "\$GHIDRA_BIN")")"
               fi
             fi
-            exec "$out/bin/.ghidra-unwrapped" "\$@"
+            exec "$out/bin/.ghidra-cli-unwrapped" "\$@"
             WRAPPER
-            chmod +x $out/bin/ghidra
+            chmod +x $out/bin/ghidra-cli
           '';
         });
       in
