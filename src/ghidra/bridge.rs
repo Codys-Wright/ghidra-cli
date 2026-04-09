@@ -266,11 +266,13 @@ pub fn start_bridge(
 ) -> Result<u16> {
     info!("Starting Ghidra bridge...");
 
-    // Write the Java bridge script to disk
-    let scripts_dir = dirs::config_dir()
-        .ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?
-        .join("ghidra-cli")
-        .join("scripts");
+    // Write the Java bridge script to a NON-HIDDEN path.
+    // Ghidra 11.1+ uses Bnd for OSGi bundles, and Bnd silently skips
+    // files under hidden directories (paths starting with '.').
+    // Using ~/.config/ would cause script compilation to fail.
+    let scripts_dir = dirs::home_dir()
+        .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?
+        .join("ghidra_scripts");
     std::fs::create_dir_all(&scripts_dir)?;
     let java_script_path = scripts_dir.join("GhidraCliBridge.java");
     std::fs::write(&java_script_path, JAVA_BRIDGE_SCRIPT)?;

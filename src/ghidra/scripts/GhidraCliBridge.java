@@ -2537,16 +2537,14 @@ public class GhidraCliBridge extends GhidraScript {
             Function func = findFunctionByNameOrAddress(target);
             if (func == null) return errorResult(buildFunctionTargetHint(target));
 
-            // Parse the signature using Ghidra's C parser
-            ghidra.app.util.cparser.C.CParserUtils.CParseResults parseResults =
+            // Parse the signature using Ghidra's C parser (Ghidra 12+ API)
+            FunctionDefinition funcDef = (FunctionDefinition)
                 ghidra.app.util.cparser.C.CParserUtils.parseSignature(
-                    this, currentProgram, sigStr);
+                    (ghidra.framework.plugintool.ServiceProvider) null, currentProgram, sigStr);
 
-            if (parseResults == null || parseResults.getDataType() == null) {
+            if (funcDef == null) {
                 return errorResult("Failed to parse signature: " + sigStr);
             }
-
-            FunctionDefinition funcDef = (FunctionDefinition) parseResults.getDataType();
 
             int txId = currentProgram.startTransaction("Set function signature");
             try {
